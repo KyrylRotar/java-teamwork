@@ -2,13 +2,18 @@ package lab8.task4;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 
 public final class Task4 {
     private Task4() {
     }
 
     public static void main(String[] args) {
-        LoanPolicyRegistry policies = LoanPolicyRegistry.defaults();
+        LoanPolicyRegistry policies = new LoanPolicyRegistry(Map.of(
+                BookCategory.STANDARD, new StandardLoanTermsPolicy(),
+                BookCategory.RARE, new RareLoanTermsPolicy(),
+                BookCategory.ACADEMIC, new AcademicLoanTermsPolicy()
+        ));
         Book book = new Book(
                 104,
                 "Алгоритми та структури даних",

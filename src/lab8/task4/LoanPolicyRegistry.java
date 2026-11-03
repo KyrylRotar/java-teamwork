@@ -1,6 +1,5 @@
 package lab8.task4;
 
-import java.util.Collection;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
@@ -8,26 +7,16 @@ import java.util.Objects;
 public final class LoanPolicyRegistry {
     private final Map<BookCategory, LoanTermsPolicy> policies;
 
-    public LoanPolicyRegistry(Collection<? extends LoanTermsPolicy> policies) {
+    public LoanPolicyRegistry(Map<BookCategory, ? extends LoanTermsPolicy> policies) {
         Objects.requireNonNull(policies, "Політики видачі обов'язкові.");
         EnumMap<BookCategory, LoanTermsPolicy> indexedPolicies = new EnumMap<>(BookCategory.class);
-        for (LoanTermsPolicy policy : policies) {
-            Objects.requireNonNull(policy, "Політика видачі не може бути null.");
-            if (indexedPolicies.putIfAbsent(policy.category(), policy) != null) {
-                throw new IllegalArgumentException(
-                        "Для категорії " + policy.category().getLabel() + " задано кілька політик."
-                );
-            }
+        for (Map.Entry<BookCategory, ? extends LoanTermsPolicy> entry : policies.entrySet()) {
+            indexedPolicies.put(
+                    Objects.requireNonNull(entry.getKey(), "Категорія політики обов'язкова."),
+                    Objects.requireNonNull(entry.getValue(), "Політика видачі не може бути null.")
+            );
         }
         this.policies = Map.copyOf(indexedPolicies);
-    }
-
-    public static LoanPolicyRegistry defaults() {
-        return new LoanPolicyRegistry(java.util.List.of(
-                new StandardLoanTermsPolicy(),
-                new RareLoanTermsPolicy(),
-                new AcademicLoanTermsPolicy()
-        ));
     }
 
     public LoanTerms calculate(Book book) {
