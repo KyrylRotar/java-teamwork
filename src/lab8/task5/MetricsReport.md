@@ -1,43 +1,48 @@
-# Завдання 5. Метрики якості дизайну
+# Завдання 5. Метрики якості дизайну (варіант 4)
+
+**Варіант:** публічна або університетська бібліотека. Розрахунки виконані для legacy-прикладу `LegacyLibraryProcessor` з `variants-java.xml` і фактичної реалізації завдань 2–4 у `src/lab8/task2/`, `src/lab8/task3/` та `src/lab8/task4/`. У таблицях використано повні назви однойменних класів із різних пакетів.
 
 ## Методика
 
-Метрики пораховано за варіантом 4 лабораторної: вихідний `LegacyLibraryProcessor` з `variants-java.xml` порівнюється з реалізацією у `src/lab8/task4/`. У CBO враховано унікальні типи проєкту, на які клас посилається через поля, параметри, результати методів, виклики та реалізацію інтерфейсів. Типи `java.*`, примітиви та `String` не враховуються. У LCOM4 конструкції, статичні методи й згенеровані record-accessors не є вузлами графа; методи з'єднані спільним полем або прямим викликом.
+Для CBO рахується кількість унікальних типів проєкту, на які клас посилається через поля, параметри, результати методів, виклики, створення об'єктів або реалізацію інтерфейсів. Типи Java, примітиви та `String` не враховуються. Для LCOM4 вершинами є бізнес-методи; конструктори та звичайні accessors/getters виключені, ребро додається за спільним полем або прямим викликом іншого методу. Якщо клас не має бізнес-методів, LCOM4 позначено «—».
 
-## CBO до і після рефакторингу
+## CBO до та після рефакторингу
 
 | Етап | Клас | Пов'язані типи проєкту | CBO |
 |---|---|---|---:|
 | До | `LegacyLibraryProcessor` | `Reader`, `Book`, `LoanRecord` | 3 |
 | До | `LoanRecord` | `Reader`, `Book` | 2 |
-| Після | `Task4` (composition root) | `LoanPolicyRegistry`, `Book`, `BookCategory`, `LoanRecord`, три політики категорій | 7 |
-| Після | `LoanPolicyRegistry` | `BookCategory`, `LoanTermsPolicy`, `Book`, `LoanTerms` | 4 |
-| Після | `LoanRecord` | `Book`, `LoanTerms`, `LoanPolicyRegistry`, `BookCategory` | 4 |
-| Після | `LoanTermsPolicy` | `Book`, `BookCategory`, `LoanTerms` | 3 |
-| Після | `StandardLoanTermsPolicy` | `LoanTermsPolicy`, `Book`, `BookCategory`, `LoanTerms` | 4 |
-| Після | `RareLoanTermsPolicy` | `LoanTermsPolicy`, `Book`, `BookCategory`, `LoanTerms` | 4 |
-| Після | `AcademicLoanTermsPolicy` | `LoanTermsPolicy`, `Book`, `BookCategory`, `LoanTerms` | 4 |
-| Після | `LoanTerms` | — | 0 |
+| Після | `lab8.task2.Reader` | — | 0 |
+| Після | `lab8.task2.Book` | `lab8.task2.BookCategory` | 1 |
+| Після | `lab8.task2.LoanRecord` | `lab8.task2.Reader`, `lab8.task2.Book` | 2 |
+| Після | `lab8.task3.LoanController` | `IAuditLogger`, `IEmailNotifier`, `LoanTermsPolicy`, `LoanRequestDTO`, `LoanReceiptDTO`, `lab8.task2.BookCategory`, `lab8.task2.Book`, `lab8.task2.Reader`, `lab8.task2.LoanRecord`, `lab8.task4.BookCategory`, `lab8.task4.Book`, `LoanTerms` | 12 |
+| Після | `lab8.task4.LoanPolicyRegistry` | `lab8.task4.BookCategory`, `LoanTermsPolicy`, `lab8.task4.Book`, `LoanTerms` | 4 |
+| Після | `lab8.task4.StandardLoanTermsPolicy` | `LoanTermsPolicy`, `lab8.task4.Book`, `lab8.task4.BookCategory`, `LoanTerms` | 4 |
+| Після | `lab8.task4.RareLoanTermsPolicy` | `LoanTermsPolicy`, `lab8.task4.Book`, `lab8.task4.BookCategory`, `LoanTerms` | 4 |
+| Після | `lab8.task4.AcademicLoanTermsPolicy` | `LoanTermsPolicy`, `lab8.task4.Book`, `lab8.task4.BookCategory`, `LoanTerms` | 4 |
+| Після | `lab8.task4.LoanTerms` | — | 0 |
 
-Усі доменні класи та політики після рефакторингу відповідають цільовому `CBO ≤ 4`. `Task4` як composition root навмисно створює всі конкретні політики й передає їх реєстру, тому має більше залежностей; це місце конфігурації, а не доменний клас чи контролер, і його високий CBO не переноситься в бізнес-логіку.
+**Висновок за CBO:** доменні класи та політики відповідають цільовому `CBO ≤ 4`. Однак інтеграційний `LoanController` має `CBO = 12`, тобто ціль для контролера поки не досягнута. Причина — контролер напряму координує DTO, аудит, email, доменні сутності Task 2 та паралельні `Book`/`BookCategory` Task 4. Це виміряний стан наявного коду, а не припущення, що метрика покращилася. Для досягнення порогу потрібно зменшити відповідальність контролера і усунути дублювання доменних типів між Task 2 та Task 4.
 
-Важливе обмеження метрики: CBO вихідного `LegacyLibraryProcessor` дорівнює 3, тож для цього невеликого прикладу некоректно стверджувати, що його числове значення зменшилося. Рефакторинг розподілив відповідальності між класами з CBO не вище 4 і прибрав змінні правила категорій із монолітного методу; сам CBO не вимірює розмір методу чи кількість його обов'язків.
+Числовий CBO legacy-класу `LegacyLibraryProcessor` становить 3, тому його не можна коректно описати як зменшений після рефакторингу. Рефакторинг ізолював правила категорій у стратегіях та знизив CBO доменних сутностей, але інтегрований контролер потребує окремого доопрацювання.
 
 ## LCOM4 після рефакторингу
 
-| Клас | Вершини графа та зв'язки | LCOM4 |
+| Клас | Зв'язність бізнес-методів | LCOM4 |
 |---|---|---:|
-| `LoanPolicyRegistry` | Єдиний бізнес-метод `calculate` працює зі станом реєстру | 1 |
-| `LoanRecord` | `receipt` формує квитанцію зі стану запису; фабричний `issue` є статичним | 1 |
-| `LoanTermsPolicy` | `calculate` — єдина операція контракту | 1 |
-| `StandardLoanTermsPolicy` | `calculate` — єдина бізнес-операція | 1 |
-| `RareLoanTermsPolicy` | `calculate` — єдина бізнес-операція | 1 |
-| `AcademicLoanTermsPolicy` | `calculate` — єдина бізнес-операція | 1 |
-| `LoanTerms` | `totalPayable` працює зі складниками умов видачі | 1 |
-| `Book` | Незмінний record даних без власних бізнес-методів | Не застосовується |
+| `LegacyLibraryProcessor` (до) | Один монолітний `issueBookFromConsole`; метрика не показує змішані обов'язки всередині одного методу | 1 |
+| `lab8.task2.Reader` | `canBorrowMoreBooks` та `incrementLoans` спільно змінюють/читають `activeLoansCount` | 1 |
+| `lab8.task2.Book` | Немає бізнес-методів; лише дані та accessors | — |
+| `lab8.task2.LoanRecord` | Бізнес-розрахунок підсумкової суми утворює одну зв'язну компоненту | 1 |
+| `lab8.task3.LoanController` | Один use-case метод `processLoan` | 1 |
+| `lab8.task4.LoanPolicyRegistry` | Один бізнес-метод `calculate` | 1 |
+| `lab8.task4.StandardLoanTermsPolicy` | `calculate` викликає перевірку категорії | 1 |
+| `lab8.task4.RareLoanTermsPolicy` | `calculate` викликає перевірку категорії | 1 |
+| `lab8.task4.AcademicLoanTermsPolicy` | `calculate` викликає перевірку категорії | 1 |
+| `lab8.task4.LoanTerms` | `totalPayable` працює зі складниками умов видачі | 1 |
 
-У старому `LegacyLibraryProcessor` є лише один метод `issueBookFromConsole`, тому механічний підрахунок дає LCOM4 = 1. Це не свідчить про високу згуртованість: метрика не розділяє незалежні кроки, змішані в одному великому методі. Після рефакторингу кожен клас має одну чітку відповідальність, а не просто один монолітний метод.
+**Висновок за LCOM4:** виміряні класи з бізнес-поведінкою мають `LCOM4 = 1`, що відповідає цільовій згуртованості. Значення 1 для legacy-класу та контролера з одним методом не доводить відсутність змішаних обов'язків: LCOM4 не розбиває один метод на окремі кроки.
 
-## Висновок
+## Підсумок
 
-Заставу та сервісний збір обчислюють окремі поліморфні політики, а `LoanPolicyRegistry` вибирає їх за категорією через інтерфейс і мапу. Додавання категорії не потребує змін у наявних політиках; залежності доменних класів обмежені чотирма типами проєкту, а LCOM4 поведінкових класів дорівнює 1. Реєстр політик залежить лише від контрактів і доменних типів; створення конкретних реалізацій ізольовано в composition root.
+У варіанті 4 правила застави та сервісного збору ізольовані поліморфними політиками; доменні класи Task 2 і політики Task 4 мають `CBO ≤ 4`, а згуртованість бізнес-класів — `LCOM4 = 1`. Єдиний явний виняток — `LoanController` (`CBO = 12`): інтеграція завдань 2–4 залишила в ньому надто багато залежностей і дубльовані типи книги та категорії. Цей висновок фіксує фактичну метрику та конкретний напрямок подальшого рефакторингу, замість заявляти про недоведене досягнення порогу.
