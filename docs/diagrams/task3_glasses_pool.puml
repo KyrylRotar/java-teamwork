@@ -1,0 +1,48 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+title Варіант 4. Завдання 3: Шаблон Object Pool (Видача 3D-окулярів)
+
+class Glasses <<Reusable>> {
+    - id : String
+    - currentSeat : String
+    - usageCount : int
+    - {static} TIME_FORMAT : DateTimeFormatter
+    __
+    + Glasses(id : String)
+    - emulateAcquisitionCost() : void
+    + assignToSeat(seat : String) : void
+    + sanitizeAndReset() : void
+    + getId() : String
+    + getCurrentSeat() : String
+    + getUsageCount() : int
+    - log(message : String) : void
+}
+
+class GlassesPool <<ObjectPool>> {
+    - poolCapacity : int
+    - allCreatedGlasses : List<Glasses>
+    - availableGlasses : Queue<Glasses>
+    - waitingQueue : Queue<String>
+    - {static} TIME_FORMAT : DateTimeFormatter
+    __
+    + GlassesPool(capacity : int)
+    + acquireGlasses(seat : String) : Glasses
+    + releaseGlasses(g : Glasses) : void
+    + getPoolCapacity() : int
+    + printStatistics() : void
+    - log(message : String) : void
+}
+
+class Task3Runner <<Client>> {
+    - {static} TIME_FORMAT : DateTimeFormatter
+    __
+    + {static} main(args : String[]) : void
+    + {static} runScenario() : void
+    - {static} log(message : String) : void
+}
+
+GlassesPool "1" *-- "4" Glasses : manages / contains >
+Task3Runner ..> GlassesPool : uses >
+Task3Runner ..> Glasses : interacts with >
+@enduml
