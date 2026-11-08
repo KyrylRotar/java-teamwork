@@ -1,0 +1,100 @@
+@startuml lab9-task2-prototype
+!pragma layout smetana
+title Завдання 2 — Формування сеансів (Prototype)
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+hide empty members
+
+class ScreeningCatalog <<Prototype registry>> {
+  - prototypes: Map<PrototypeKey, ScreeningPrototype>
+  + getOrCreatePrototype(movieTitle: String, roomNumber: int): ScreeningPrototype
+}
+
+class PrototypeKey <<Registry key>> {
+  - movieTitle: String
+  - roomNumber: int
+  ~ PrototypeKey(movieTitle: String, roomNumber: int)
+  + equals(other: Object): boolean
+  + hashCode(): int
+}
+
+class ScreeningPrototype <<Prototype>> {
+  - movieTitle: String
+  - roomNumber: int
+  - rowPrices: Map<Integer, BigDecimal>
+  - advertisingBlock: AdvertisingBlock
+  - seatStatuses: Map<Seat, SeatStatus>
+  ~ ScreeningPrototype(movieTitle: String, roomNumber: int, rowPrices: Map, advertisingBlock: AdvertisingBlock, seatStatuses: Map)
+  + createScreening(startsAt: LocalDateTime): Screening
+  {static} ~ configuredFor(movieTitle: String, roomNumber: int): ScreeningPrototype
+  + toString(): String
+}
+
+class Screening <<Product copy>> {
+  - movieTitle: String
+  - roomNumber: int
+  - startsAt: LocalDateTime
+  - rowPrices: Map<Integer, BigDecimal>
+  - advertisingBlock: AdvertisingBlock
+  - seatStatuses: Map<Seat, SeatStatus>
+  ~ Screening(movieTitle: String, roomNumber: int, startsAt: LocalDateTime, rowPrices: Map, advertisingBlock: AdvertisingBlock, seatStatuses: Map)
+  + changeRowPrice(row: int, price: BigDecimal): void
+  + replaceAdvertisingClip(index: int, clip: String): void
+  + sellSeat(seat: Seat): void
+  + getRowPrice(row: int): BigDecimal
+  + getAdvertisingBlock(): AdvertisingBlock
+  + getSeatStatuses(): Map<Seat, SeatStatus>
+  + getStartsAt(): LocalDateTime
+  + toString(): String
+}
+
+class AdvertisingBlock <<Mutable nested data>> {
+  - clips: List<String>
+  + AdvertisingBlock(clips: List<String>)
+  - AdvertisingBlock(source: AdvertisingBlock)
+  + copy(): AdvertisingBlock
+  + replaceClip(index: int, clip: String): void
+  + getClips(): List<String>
+  + toString(): String
+}
+
+class Seat <<Immutable value>> {
+  - row: int
+  - number: int
+  + Seat(row: int, number: int)
+  + getRow(): int
+  + getNumber(): int
+  + equals(other: Object): boolean
+  + hashCode(): int
+  + toString(): String
+}
+
+enum SeatStatus {
+  AVAILABLE
+  SOLD
+}
+
+class Task2 <<Client>> {
+  - Task2()
+  {static} + main(args: String[]): void
+  {static} - verifyIsolation(prototype: ScreeningPrototype, screenings: List<Screening>, changedScreening: Screening): void
+}
+
+ScreeningCatalog "1" o-- "0..*" ScreeningPrototype : prototypes
+ScreeningCatalog "1" *-- "0..*" PrototypeKey : map keys
+ScreeningPrototype ..> Screening : creates independent copies
+ScreeningPrototype "1" *-- "1" AdvertisingBlock : template data
+ScreeningPrototype "1" --> "0..*" Seat : template seat keys
+ScreeningPrototype "1" --> "0..*" SeatStatus : template states
+Screening "1" *-- "1" AdvertisingBlock : deep copy
+Screening "1" --> "0..*" Seat : seat keys
+Screening "1" --> "0..*" SeatStatus : mutable seat states
+Task2 ..> ScreeningCatalog
+Task2 ..> Screening
+Task2 ..> Seat
+
+note bottom of Screening
+  Each copy receives independent maps and a copied
+  AdvertisingBlock; Seat is immutable and safe to share.
+end note
+@enduml

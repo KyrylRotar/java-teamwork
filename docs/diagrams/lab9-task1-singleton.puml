@@ -1,0 +1,73 @@
+@startuml lab9-task1-singleton
+!pragma layout smetana
+title Завдання 1 — Спільний продаж квитків (Singleton)
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+hide empty members
+
+class CinemaTicketingSystem <<Singleton>> {
+  {static} - INSTANCE: CinemaTicketingSystem
+  - systemId: String
+  - soldSeats: Map<Screening, Map<Seat, SalesChannel>>
+  - CinemaTicketingSystem()
+  {static} + getInstance(): CinemaTicketingSystem
+  + getSystemId(): String
+  + sellSeat(screening: Screening, seat: Seat, channel: SalesChannel): void
+  + isSeatAvailable(screening: Screening, seat: Seat): boolean
+}
+
+class Task1 <<Client>> {
+  - Task1()
+  {static} + main(args: String[]): void
+  {static} - printSystemId(channel: SalesChannel, system: CinemaTicketingSystem): void
+}
+
+class Screening <<Domain value>> {
+  - movieTitle: String
+  - roomNumber: int
+  - startsAt: LocalDateTime
+  + Screening(movieTitle: String, roomNumber: int, startsAt: LocalDateTime)
+  + equals(other: Object): boolean
+  + hashCode(): int
+}
+
+class Seat <<Domain value>> {
+  - row: int
+  - number: int
+  + Seat(row: int, number: int)
+  + equals(other: Object): boolean
+  + hashCode(): int
+  + toString(): String
+}
+
+enum SalesChannel <<Sale channel>> {
+  CASHIER
+  WEBSITE
+  MOBILE_APP
+  - displayName: String
+  ~ SalesChannel(displayName: String)
+  + getDisplayName(): String
+}
+
+class SeatAlreadySoldException <<Domain exception>> {
+  + SeatAlreadySoldException(seat: Seat, soldBy: SalesChannel)
+}
+
+class IllegalStateException <<Java exception>> <<external>>
+
+Task1 ..> CinemaTicketingSystem : obtains shared instance
+Task1 ..> SalesChannel
+CinemaTicketingSystem "1" --> "0..*" Screening : soldSeats keys
+CinemaTicketingSystem "1" --> "0..*" Seat : seat keys
+CinemaTicketingSystem "1" --> "0..*" SalesChannel : sale values
+CinemaTicketingSystem ..> SeatAlreadySoldException : throws
+SeatAlreadySoldException --|> IllegalStateException
+SeatAlreadySoldException ..> Seat
+SeatAlreadySoldException ..> SalesChannel
+
+note right of CinemaTicketingSystem
+  Private constructor and one static instance.
+  Synchronized sales protect the shared seat state
+  across cashier, website and mobile app.
+end note
+@enduml
