@@ -1,0 +1,88 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+title Лабораторна №10. Завдання 3: Abstract Factory (Налаштування залу)
+
+interface MovieCopy <<AbstractProduct>> {
+    + getFormat() : String
+    + getDescription() : String
+}
+
+interface ProjectorProfile <<AbstractProduct>> {
+    + getFormat() : String
+    + getConfiguration() : String
+}
+
+interface SoundProfile <<AbstractProduct>> {
+    + getFormat() : String
+    + getAudioSetup() : String
+}
+
+interface CinemaFormatFactory <<AbstractFactory>> {
+    + getFormatName() : String
+    + createMovieCopy(movieTitle : String) : MovieCopy
+    + createProjectorProfile() : ProjectorProfile
+    + createSoundProfile() : SoundProfile
+}
+
+class Format2DFactory <<ConcreteFactory>> {
+    + getFormatName() : String
+    + createMovieCopy(movieTitle : String) : MovieCopy
+    + createProjectorProfile() : ProjectorProfile
+    + createSoundProfile() : SoundProfile
+}
+
+class Format3DFactory <<ConcreteFactory>> {
+    + getFormatName() : String
+    + createMovieCopy(movieTitle : String) : MovieCopy
+    + createProjectorProfile() : ProjectorProfile
+    + createSoundProfile() : SoundProfile
+}
+
+class DolbyAtmosFactory <<ConcreteFactory>> {
+    + getFormatName() : String
+    + createMovieCopy(movieTitle : String) : MovieCopy
+    + createProjectorProfile() : ProjectorProfile
+    + createSoundProfile() : SoundProfile
+}
+
+class ImaxFactory <<ConcreteFactory>> {
+    + getFormatName() : String
+    + createMovieCopy(movieTitle : String) : MovieCopy
+    + createProjectorProfile() : ProjectorProfile
+    + createSoundProfile() : SoundProfile
+}
+
+class HallController <<Client>> {
+    - {static} TIME_FORMAT : DateTimeFormatter
+    - hallName : String
+    + HallController(hallName : String)
+    + startScreening(movieTitle : String, factory : CinemaFormatFactory) : void
+    - log(message : String) : void
+}
+
+class Task3Runner {
+    - {static} TIME_FORMAT : DateTimeFormatter
+    + {static} main(args : String[]) : void
+    + {static} runScenario() : void
+    - {static} log(message : String) : void
+}
+
+Format2DFactory ..|> CinemaFormatFactory
+Format3DFactory ..|> CinemaFormatFactory
+DolbyAtmosFactory ..|> CinemaFormatFactory
+ImaxFactory ..|> CinemaFormatFactory
+
+CinemaFormatFactory ..> MovieCopy : creates >
+CinemaFormatFactory ..> ProjectorProfile : creates >
+CinemaFormatFactory ..> SoundProfile : creates >
+
+HallController ..> CinemaFormatFactory : uses >
+HallController ..> MovieCopy : uses >
+HallController ..> ProjectorProfile : uses >
+HallController ..> SoundProfile : uses >
+
+Task3Runner ..> HallController : uses >
+Task3Runner ..> CinemaFormatFactory : instantiates >
+@enduml
