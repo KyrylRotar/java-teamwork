@@ -1,0 +1,34 @@
+flowchart LR
+    subgraph STREAM1["Stream-aligned: Онлайн-купівля квитків (4)"]
+        Browse["Каталог сеансів для глядача"]
+        Order["Вибір місць · замовлення · онлайн-оплата"]
+    end
+
+    subgraph STREAM2["Stream-aligned: Кінотеатр і касове обслуговування (4)"]
+        Channels["Розклад сеансів · каса"]
+        Ticket["Видача/перевірка квитка · сповіщення"]
+    end
+
+    subgraph SUBSYSTEM["Complicated-subsystem: Резервування місць (3)"]
+        Inventory["Seat Inventory API"]
+        Concurrency["Резерв · тайм-аут · захист від подвійного продажу"]
+    end
+
+    subgraph PLATFORM["Platform: Внутрішня платформа (3)"]
+        Delivery["CI/CD · середовища · спостережуваність"]
+        Data["Керовані БД · шаблони сервісів"]
+    end
+
+    subgraph ENABLING["Enabling: Якість і безпека (2)"]
+        Coaching["Наставництво з QA та безпеки"]
+    end
+
+    Browse --> Order
+    Order -->|"Collaboration на етапі узгодження контракту; далі API"| Inventory
+    Channels -->|"Collaboration при запуску інтеграції; далі API"| Inventory
+    Order --> Channels
+    Ticket --> Channels
+    STREAM1 -.->|"X-as-a-Service: self-service CI/CD"| PLATFORM
+    STREAM2 -.->|"X-as-a-Service: середовища та моніторинг"| PLATFORM
+    ENABLING -.->|"Facilitation: тимчасове наставництво"| STREAM1
+    ENABLING -.->|"Facilitation: тимчасове наставництво"| STREAM2
