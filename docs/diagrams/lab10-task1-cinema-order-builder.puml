@@ -1,0 +1,87 @@
+@startuml lab10-task1-cinema-order-builder
+!pragma layout smetana
+title Варіант 4 — Замовлення глядача (Builder)
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+hide empty members
+
+class Task1 <<Client>> {
+  {static} - minute: int
+  - Task1()
+  {static} + main(args: String[]): void
+  {static} - demonstrateCustomOrder(session: MovieSession): void
+  {static} - demonstrateComboForTwo(session: MovieSession): void
+  {static} - demonstrateOrderWithoutSeats(session: MovieSession): void
+  {static} - log(source: String, event: String): void
+}
+
+class CinemaOrderDirector <<Director>> {
+  + createComboForTwo(session: MovieSession): CinemaOrder
+  + createFamilyEvening(session: MovieSession): CinemaOrder
+  - buildTypicalOrder(name: String, session: MovieSession, seats: List<String>, popcornPortions: int, drinkCount: int, glasses3dCount: int): CinemaOrder
+}
+
+class CinemaOrderBuilder <<Builder>> {
+  - orderName: String
+  - session: MovieSession
+  - seats: List<String>
+  - popcornPortions: int
+  - drinkCount: int
+  - glasses3dCount: int
+  - promoCode: String
+  - vipService: boolean
+  + setOrderName(orderName: String): CinemaOrderBuilder
+  + setSession(session: MovieSession): CinemaOrderBuilder
+  + addSeat(seat: String): CinemaOrderBuilder
+  + addPopcorn(portions: int): CinemaOrderBuilder
+  + addDrinks(count: int): CinemaOrderBuilder
+  + add3dGlasses(count: int): CinemaOrderBuilder
+  + applyPromoCode(promoCode: String): CinemaOrderBuilder
+  + enableVipService(): CinemaOrderBuilder
+  + build(): CinemaOrder
+  ~ getOrderName(): String
+  ~ getSession(): MovieSession
+  ~ getSeats(): List<String>
+  ~ getPopcornPortions(): int
+  ~ getDrinkCount(): int
+  ~ getGlasses3dCount(): int
+  ~ getPromoCode(): String
+  ~ isVipService(): boolean
+  {static} - requireText(value: String, fieldName: String): String
+  {static} - requirePositive(value: int, fieldName: String): int
+}
+
+class CinemaOrder <<Product>> {
+  - orderName: String {readOnly}
+  - session: MovieSession {readOnly}
+  - seats: List<String> {readOnly}
+  - popcornPortions: int {readOnly}
+  - drinkCount: int {readOnly}
+  - glasses3dCount: int {readOnly}
+  - promoCode: String {readOnly}
+  - vipService: boolean {readOnly}
+  ~ CinemaOrder(builder: CinemaOrderBuilder)
+  + toString(): String
+}
+
+class MovieSession <<Domain value>> {
+  + movieTitle: String {readOnly}
+  + startsAt: LocalDateTime {readOnly}
+  + MovieSession(movieTitle: String, startsAt: LocalDateTime)
+  + toString(): String
+}
+
+Task1 ..> CinemaOrderBuilder : creates custom order
+Task1 ..> CinemaOrderDirector : uses presets
+Task1 ..> MovieSession : creates
+CinemaOrderDirector ..> CinemaOrderBuilder : directs
+CinemaOrderDirector ..> MovieSession : receives
+CinemaOrderBuilder ..> CinemaOrder : <<creates>>
+CinemaOrderBuilder "0..*" --> "0..1" MovieSession : selected session
+CinemaOrder "0..*" --> "1" MovieSession : for session
+
+note bottom of CinemaOrderBuilder
+  build() rejects missing session or seats.
+  Returned CinemaOrder is immutable.
+end note
+@enduml
