@@ -1,0 +1,102 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+title Лабораторна №10. Завдання 2: Factory Method (Канали продажу квитків)
+
+interface Ticket <<Product>> {
+    + getType() : String
+    + getDetails() : String
+    + getFormattedOutput() : String
+}
+
+class PaperTicket <<ConcreteProduct>> {
+    - movie : String
+    - seat : String
+    + PaperTicket(movie : String, seat : String)
+    + getType() : String
+    + getDetails() : String
+    + getFormattedOutput() : String
+}
+
+class PdfTicket <<ConcreteProduct>> {
+    - movie : String
+    - seat : String
+    + PdfTicket(movie : String, seat : String)
+    + getType() : String
+    + getDetails() : String
+    + getFormattedOutput() : String
+}
+
+class WalletTicket <<ConcreteProduct>> {
+    - movie : String
+    - seat : String
+    + WalletTicket(movie : String, seat : String)
+    + getType() : String
+    + getDetails() : String
+    + getFormattedOutput() : String
+}
+
+class KioskReceiptTicket <<ConcreteProduct>> {
+    - movie : String
+    - seat : String
+    + KioskReceiptTicket(movie : String, seat : String)
+    + getType() : String
+    + getDetails() : String
+    + getFormattedOutput() : String
+}
+
+abstract class TicketSalesChannel <<Creator>> {
+    - {static} TIME_FORMAT : DateTimeFormatter
+    - channelName : String
+    + TicketSalesChannel(channelName : String)
+    + sellTicket(movie : String, seat : String, price : double) : Ticket
+    # {abstract} createTicket(movie : String, seat : String) : Ticket
+    # log(message : String) : void
+}
+
+class BoxOfficeChannel <<ConcreteCreator>> {
+    + BoxOfficeChannel()
+    # createTicket(movie : String, seat : String) : Ticket
+}
+
+class WebsiteChannel <<ConcreteCreator>> {
+    + WebsiteChannel()
+    # createTicket(movie : String, seat : String) : Ticket
+}
+
+class MobileAppChannel <<ConcreteCreator>> {
+    + MobileAppChannel()
+    # createTicket(movie : String, seat : String) : Ticket
+}
+
+class SelfServiceKioskChannel <<ConcreteCreator>> {
+    + SelfServiceKioskChannel()
+    # createTicket(movie : String, seat : String) : Ticket
+}
+
+class Task2Runner <<Client>> {
+    - {static} TIME_FORMAT : DateTimeFormatter
+    + {static} main(args : String[]) : void
+    + {static} runScenario() : void
+    - {static} log(message : String) : void
+}
+
+PaperTicket ..|> Ticket
+PdfTicket ..|> Ticket
+WalletTicket ..|> Ticket
+KioskReceiptTicket ..|> Ticket
+
+BoxOfficeChannel --|> TicketSalesChannel
+WebsiteChannel --|> TicketSalesChannel
+MobileAppChannel --|> TicketSalesChannel
+SelfServiceKioskChannel --|> TicketSalesChannel
+
+TicketSalesChannel ..> Ticket : creates / uses >
+BoxOfficeChannel ..> PaperTicket : <<create>>
+WebsiteChannel ..> PdfTicket : <<create>>
+MobileAppChannel ..> WalletTicket : <<create>>
+SelfServiceKioskChannel ..> KioskReceiptTicket : <<create>>
+
+Task2Runner ..> TicketSalesChannel : uses >
+@enduml

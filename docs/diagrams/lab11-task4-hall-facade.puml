@@ -1,0 +1,55 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+class CinemaHallFacade <<Facade>> {
+  - copyLoader : MovieCopyLoader
+  - projector : ProjectorSystem
+  - sound : SoundSystem
+  - lighting : LightingSystem
+  - ticketSales : TicketSalesSystem
+  - adPlayer : AdPlayerSystem
+  + CinemaHallFacade(copyLoader : MovieCopyLoader, projector : ProjectorSystem, sound : SoundSystem, lighting : LightingSystem, ticketSales : TicketSalesSystem, adPlayer : AdPlayerSystem)
+  + prepareSession(initiator : String, sessionId : String, movieTitle : String, format : String) : void
+}
+
+class MovieCopyLoader <<Subsystem>> {
+  + loadCopy(movieTitle : String) : void
+}
+
+class ProjectorSystem <<Subsystem>> {
+  + configure(format : String) : void
+}
+
+class SoundSystem <<Subsystem>> {
+  + calibrate(profile : String) : void
+}
+
+class LightingSystem <<Subsystem>> {
+  + dimForAds() : void
+  + turnOnFullLight() : void
+}
+
+class TicketSalesSystem <<Subsystem>> {
+  + openSales(sessionId : String) : void
+}
+
+class AdPlayerSystem <<Subsystem>> {
+  + startAds() : void
+}
+
+class Task4Runner <<Client>> {
+  + {static} main(args : String[]) : void
+  + {static} run() : void
+}
+
+CinemaHallFacade o--> "1" MovieCopyLoader
+CinemaHallFacade o--> "1" ProjectorSystem
+CinemaHallFacade o--> "1" SoundSystem
+CinemaHallFacade o--> "1" LightingSystem
+CinemaHallFacade o--> "1" TicketSalesSystem
+CinemaHallFacade o--> "1" AdPlayerSystem
+
+Task4Runner ..> CinemaHallFacade : prepares session
+Task4Runner ..> LightingSystem : direct emergency call
+@enduml

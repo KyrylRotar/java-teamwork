@@ -1,0 +1,77 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+interface MovieSession <<Component>> {
+  + getDescription() : String
+  + getPrice() : double
+}
+
+class BaseSession <<ConcreteComponent>> {
+  - movieTitle : String
+  - hall : String
+  - basePrice : double
+  + BaseSession(movieTitle : String, hall : String, basePrice : double)
+  + getDescription() : String
+  + getPrice() : double
+}
+
+abstract class SessionDecorator <<Decorator>> {
+  # wrappedSession : MovieSession
+  + SessionDecorator(wrappedSession : MovieSession)
+  + getDescription() : String
+  + getPrice() : double
+}
+
+class ThreeDDecorator <<ConcreteDecorator>> {
+  - {static} SURCHARGE : double = 50.0
+  + ThreeDDecorator(wrappedSession : MovieSession)
+  + getDescription() : String
+  + getPrice() : double
+}
+
+class SubtitlesDecorator <<ConcreteDecorator>> {
+  - {static} SURCHARGE : double = 15.0
+  + SubtitlesDecorator(wrappedSession : MovieSession)
+  + getDescription() : String
+  + getPrice() : double
+}
+
+class SignLanguageDecorator <<ConcreteDecorator>> {
+  - {static} SURCHARGE : double = 10.0
+  + SignLanguageDecorator(wrappedSession : MovieSession)
+  + getDescription() : String
+  + getPrice() : double
+}
+
+class QuietSessionDecorator <<ConcreteDecorator>> {
+  - {static} SURCHARGE : double = 20.0
+  + QuietSessionDecorator(wrappedSession : MovieSession)
+  + getDescription() : String
+  + getPrice() : double
+}
+
+class WeekendDiscountDecorator <<ConcreteDecorator>> {
+  - {static} DISCOUNT_RATE : double = 0.15
+  + WeekendDiscountDecorator(wrappedSession : MovieSession)
+  + getDescription() : String
+  + getPrice() : double
+}
+
+class Task3Runner <<Client>> {
+  + {static} main(args : String[]) : void
+  + {static} run() : void
+}
+
+MovieSession <|.. BaseSession
+MovieSession <|.. SessionDecorator
+SessionDecorator o--> "1" MovieSession : -wrappedSession
+
+SessionDecorator <|-- ThreeDDecorator
+SessionDecorator <|-- SubtitlesDecorator
+SessionDecorator <|-- SignLanguageDecorator
+SessionDecorator <|-- QuietSessionDecorator
+SessionDecorator <|-- WeekendDiscountDecorator
+
+Task3Runner ..> MovieSession : uses
+@enduml
