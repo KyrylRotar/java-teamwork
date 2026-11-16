@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="940" viewBox="0 0 1500 940" role="img" aria-labelledby="title description">
+  <title id="title">Варіант 4 — Трейлери фільмів (Proxy)</title>
+  <desc id="description">UML-діаграма Proxy: CinemaPoster працює з Trailer, а TrailerProxy завантажує RealTrailer на вимогу та перевіряє вік глядача.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#43536b" stroke-width="1.5"/>
+    </marker>
+    <marker id="triangle" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M1,1 L11,6 L1,11 Z" fill="#fff" stroke="#43536b" stroke-width="1.5"/>
+    </marker>
+    <style>
+      text { font-family: "Segoe UI", Arial, sans-serif; fill: #1d2939; }
+      .title { font-size: 27px; font-weight: 700; }
+      .stereo { font-size: 15px; fill: #475467; font-style: italic; }
+      .name { font-size: 20px; font-weight: 700; }
+      .member { font-size: 15px; }
+      .box { fill: #fff; stroke: #43536b; stroke-width: 1.6; }
+      .head { fill: #eaf0f8; }
+      .line { fill: none; stroke: #43536b; stroke-width: 1.7; }
+      .dash { fill: none; stroke: #43536b; stroke-width: 1.6; stroke-dasharray: 7 5; }
+      .label { font-size: 14px; fill: #475467; }
+      .note { fill: #fffbe6; stroke: #c9a227; stroke-width: 1.3; }
+    </style>
+  </defs>
+  <rect width="1500" height="940" fill="#ffffff"/>
+  <text class="title" x="750" y="42" text-anchor="middle">Варіант 4 — Трейлери фільмів (Proxy)</text>
+
+  <!-- Poster, subject interface, runner -->
+  <g>
+    <rect class="box" x="55" y="90" width="410" height="250" rx="5"/>
+    <rect class="head" x="55" y="90" width="410" height="64" rx="5"/>
+    <text class="stereo" x="260" y="114" text-anchor="middle">«Client»</text>
+    <text class="name" x="260" y="140" text-anchor="middle">CinemaPoster</text>
+    <line class="line" x1="55" y1="154" x2="465" y2="154"/>
+    <text class="member" x="75" y="181">- trailers: List&lt;Trailer&gt;</text>
+    <line class="line" x1="55" y1="193" x2="465" y2="193"/>
+    <text class="member" x="75" y="220">+ CinemaPoster(trailers)</text>
+    <text class="member" x="75" y="247">+ open(): void</text>
+    <text class="member" x="75" y="274">+ getTrailer(filmTitle): Trailer</text>
+  </g>
+  <g>
+    <rect class="box" x="545" y="90" width="410" height="210" rx="5"/>
+    <rect class="head" x="545" y="90" width="410" height="64" rx="5"/>
+    <text class="stereo" x="750" y="114" text-anchor="middle">«Subject»</text>
+    <text class="name" x="750" y="140" text-anchor="middle">Trailer</text>
+    <line class="line" x1="545" y1="154" x2="955" y2="154"/>
+    <text class="label" x="565" y="183">Спільний інтерфейс афіші й трейлерів</text>
+    <line class="line" x1="545" y1="195" x2="955" y2="195"/>
+    <text class="member" x="565" y="224">+ getFilmTitle(): String</text>
+    <text class="member" x="565" y="251">+ play(viewer: Viewer): void</text>
+  </g>
+  <g>
+    <rect class="box" x="1035" y="90" width="410" height="210" rx="5"/>
+    <rect class="head" x="1035" y="90" width="410" height="64" rx="5"/>
+    <text class="stereo" x="1240" y="114" text-anchor="middle">«Client / runner»</text>
+    <text class="name" x="1240" y="140" text-anchor="middle">Task2</text>
+    <line class="line" x1="1035" y1="154" x2="1445" y2="154"/>
+    <line class="line" x1="1035" y1="168" x2="1445" y2="168"/>
+    <text class="member" x="1055" y="197">{static} + main(args): void</text>
+    <text class="member" x="1055" y="224">{static} - demonstrateLazyTrailerProxy(): void</text>
+  </g>
+
+  <!-- Proxy and real subject -->
+  <g>
+    <rect class="box" x="330" y="435" width="500" height="300" rx="5"/>
+    <rect class="head" x="330" y="435" width="500" height="64" rx="5"/>
+    <text class="stereo" x="580" y="459" text-anchor="middle">«Proxy»</text>
+    <text class="name" x="580" y="485" text-anchor="middle">TrailerProxy</text>
+    <line class="line" x1="330" y1="499" x2="830" y2="499"/>
+    <text class="member" x="350" y="526">- filmTitle: String</text>
+    <text class="member" x="350" y="549">- ageLimit: int</text>
+    <text class="member" x="350" y="572">- realTrailer: RealTrailer</text>
+    <line class="line" x1="330" y1="584" x2="830" y2="584"/>
+    <text class="member" x="350" y="611">+ TrailerProxy(filmTitle, ageLimit)</text>
+    <text class="member" x="350" y="638">+ getFilmTitle(): String</text>
+    <text class="member" x="350" y="665">+ play(viewer: Viewer): void</text>
+    <line class="line" x1="330" y1="679" x2="830" y2="679"/>
+    <text class="label" x="350" y="706">Перевіряє право доступу й кешує реальний трейлер</text>
+  </g>
+  <g>
+    <rect class="box" x="945" y="435" width="500" height="260" rx="5"/>
+    <rect class="head" x="945" y="435" width="500" height="64" rx="5"/>
+    <text class="stereo" x="1195" y="459" text-anchor="middle">«RealSubject»</text>
+    <text class="name" x="1195" y="485" text-anchor="middle">RealTrailer</text>
+    <line class="line" x1="945" y1="499" x2="1445" y2="499"/>
+    <text class="member" x="965" y="526">- filmTitle: String</text>
+    <line class="line" x1="945" y1="538" x2="1445" y2="538"/>
+    <text class="member" x="965" y="565">+ RealTrailer(filmTitle)</text>
+    <text class="member" x="965" y="592">+ getFilmTitle(): String</text>
+    <text class="member" x="965" y="619">+ play(viewer: Viewer): void</text>
+    <line class="line" x1="945" y1="633" x2="1445" y2="633"/>
+    <text class="label" x="965" y="662">Завантажує та відтворює відеофайл</text>
+  </g>
+
+  <!-- Viewer -->
+  <g>
+    <rect class="box" x="40" y="555" width="270" height="300" rx="5"/>
+    <rect class="head" x="40" y="555" width="270" height="64" rx="5"/>
+    <text class="stereo" x="175" y="579" text-anchor="middle">«Access data»</text>
+    <text class="name" x="175" y="605" text-anchor="middle">Viewer</text>
+    <line class="line" x1="40" y1="619" x2="310" y2="619"/>
+    <text class="member" x="55" y="646">- name: String</text>
+    <text class="member" x="55" y="669">- authenticated: boolean</text>
+    <text class="member" x="55" y="692">- ageConfirmed: boolean</text>
+    <text class="member" x="55" y="715">- age: int</text>
+    <line class="line" x1="40" y1="727" x2="310" y2="727"/>
+    <text class="member" x="55" y="754">+ Viewer(...)</text>
+    <text class="member" x="55" y="781">+ getName(): String</text>
+    <text class="member" x="55" y="808">+ canWatch18Plus(): boolean</text>
+  </g>
+
+  <!-- Relationships -->
+  <path class="dash" d="M465 220 H545" marker-end="url(#arrow)"/>
+  <text class="label" x="470" y="209">uses</text>
+  <path class="line" d="M465 270 H515 V260 H545" marker-end="url(#arrow)"/>
+  <text class="label" x="470" y="253">trailers · 0..*</text>
+  <path class="dash" d="M750 300 V365 H580 V435" marker-end="url(#triangle)"/>
+  <path class="dash" d="M750 365 H1195 V435" marker-end="url(#triangle)"/>
+  <text class="label" x="790" y="354">реалізує Subject</text>
+  <path class="line" d="M830 550 H945" marker-end="url(#arrow)"/>
+  <text class="label" x="837" y="538">realTrailer · 0..1; lazy cache</text>
+  <path class="dash" d="M310 700 H320 V665 H330" marker-end="url(#arrow)"/>
+  <text class="label" x="280" y="688">перевіряє доступ</text>
+  <path class="dash" d="M310 760 H900 V620 H945" marker-end="url(#arrow)"/>
+  <text class="label" x="680" y="750">відтворення для глядача</text>
+  <path class="dash" d="M1240 300 V360 H260 V340" marker-end="url(#arrow)"/>
+  <text class="label" x="980" y="350">створює афішу, проксі та глядачів</text>
+
+  <g>
+    <rect class="note" x="330" y="785" width="1115" height="70" rx="5"/>
+    <text class="member" x="355" y="814">Відкриття афіші використовує лише Proxy; RealTrailer створюється при першому дозволеному запуску.</text>
+    <text class="member" x="355" y="840">Для 18+ потрібні авторизація, підтвердження віку та вік не менше 18 років.</text>
+  </g>
+</svg>

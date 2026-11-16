@@ -1,0 +1,65 @@
+@startuml lab11-task2-trailer-proxy
+!pragma layout smetana
+title Варіант 4 — Трейлери фільмів (Proxy)
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+hide empty members
+
+class Task2 <<Client / runner>> {
+  {static} + main(args: String[]): void
+  {static} - demonstrateLazyTrailerProxy(): void
+}
+
+class CinemaPoster <<Client>> {
+  - trailers: List<Trailer>
+  + CinemaPoster(trailers: List<Trailer>)
+  + open(): void
+  + getTrailer(filmTitle: String): Trailer
+}
+
+interface Trailer <<Subject>> {
+  + getFilmTitle(): String
+  + play(viewer: Viewer): void
+}
+
+class TrailerProxy <<Proxy>> {
+  - filmTitle: String
+  - ageLimit: int
+  - realTrailer: RealTrailer
+  + TrailerProxy(filmTitle: String, ageLimit: int)
+  + getFilmTitle(): String
+  + play(viewer: Viewer): void
+}
+
+class RealTrailer <<RealSubject>> {
+  - filmTitle: String
+  + RealTrailer(filmTitle: String)
+  + getFilmTitle(): String
+  + play(viewer: Viewer): void
+}
+
+class Viewer <<Access data>> {
+  - name: String
+  - authenticated: boolean
+  - ageConfirmed: boolean
+  - age: int
+  + Viewer(name: String, authenticated: boolean, ageConfirmed: boolean, age: int)
+  + getName(): String
+  + canWatch18Plus(): boolean
+}
+
+Trailer <|.. TrailerProxy
+Trailer <|.. RealTrailer
+TrailerProxy "1" *--> "0..1" RealTrailer : creates lazily / caches
+CinemaPoster "1" o--> "0..*" Trailer : trailers
+TrailerProxy ..> Viewer : validates access
+RealTrailer ..> Viewer : plays for
+Task2 ..> CinemaPoster : opens
+Task2 ..> TrailerProxy : creates proxies
+Task2 ..> Viewer : creates viewers
+
+note bottom of TrailerProxy
+  Checks authenticated + ageConfirmed + age >= 18
+  before creating RealTrailer. Reuses it after first load.
+end note
+@enduml

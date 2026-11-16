@@ -1,0 +1,76 @@
+@startuml lab11-task1-payment-adapter
+!pragma layout smetana
+title Варіант 4 — Підключення платіжного термінала (Adapter)
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+hide empty members
+
+class Task1 <<Client>> {
+  {static} - TICKET_PRICE: BigDecimal
+  {static} + main(args: String[]): void
+  {static} - demonstrateTerminalAdapter(): void
+}
+
+class CinemaCashDesk <<Client>> {
+  - paymentGateway: PaymentGateway
+  + CinemaCashDesk(paymentGateway: PaymentGateway)
+  + setPaymentGateway(paymentGateway: PaymentGateway): void
+  + payForTicket(amountInHryvnias: BigDecimal): PaymentResult
+}
+
+interface PaymentGateway <<Target>> {
+  + charge(amountInHryvnias: BigDecimal): PaymentResult
+}
+
+class PaymentResult <<Result>> {
+  - successful: boolean
+  - message: String
+  - PaymentResult(successful: boolean, message: String)
+  {static} + success(message: String): PaymentResult
+  {static} + declined(reason: String): PaymentResult
+  + isSuccessful(): boolean
+  + getMessage(): String
+}
+
+class NewBankTerminalAdapter <<Adapter>> {
+  - terminal: NewBankTerminal
+  + NewBankTerminalAdapter(terminal: NewBankTerminal)
+  + charge(amountInHryvnias: BigDecimal): PaymentResult
+}
+
+class NewBankTerminal <<Adaptee>> {
+  - terminalName: String
+  - availableBalanceInKopiykas: long
+  + NewBankTerminal(terminalName: String, availableBalanceInKopiykas: long)
+  + payInKopiykas(amountInKopiykas: long): int
+}
+
+class OtherBankTerminalAdapter <<Adapter>> {
+  - terminal: OtherBankTerminal
+  + OtherBankTerminalAdapter(terminal: OtherBankTerminal)
+  + charge(amountInHryvnias: BigDecimal): PaymentResult
+}
+
+class OtherBankTerminal <<Adaptee>> {
+  - availableBalanceInKopiykas: long
+  + OtherBankTerminal(availableBalanceInKopiykas: long)
+  + executeTransaction(amountInKopiykas: long): String
+}
+
+CinemaCashDesk "1" --> "1" PaymentGateway : paymentGateway
+PaymentGateway <|.. NewBankTerminalAdapter
+PaymentGateway <|.. OtherBankTerminalAdapter
+NewBankTerminalAdapter "1" --> "1" NewBankTerminal : terminal
+OtherBankTerminalAdapter "1" --> "1" OtherBankTerminal : terminal
+CinemaCashDesk ..> PaymentResult : returns
+NewBankTerminalAdapter ..> PaymentResult : creates
+OtherBankTerminalAdapter ..> PaymentResult : creates
+Task1 ..> CinemaCashDesk : demonstrates
+Task1 ..> NewBankTerminalAdapter : configures
+Task1 ..> OtherBankTerminalAdapter : switches bank
+
+note bottom of NewBankTerminalAdapter
+  Converts hryvnias to kopiykas and maps numeric
+  terminal response codes to PaymentResult.
+end note
+@enduml
