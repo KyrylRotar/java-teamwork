@@ -1,0 +1,74 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+interface DisplayMedia <<Implementor>> {
+  + getMediaName() : String
+  + renderContent(adType : String, title : String, details : String) : void
+}
+
+class HallScreenMedia <<ConcreteImplementor>> {
+  + getMediaName() : String
+  + renderContent(adType : String, title : String, details : String) : void
+}
+
+class FoyerScreensMedia <<ConcreteImplementor>> {
+  + getMediaName() : String
+  + renderContent(adType : String, title : String, details : String) : void
+}
+
+class MobileAppMedia <<ConcreteImplementor>> {
+  + getMediaName() : String
+  + renderContent(adType : String, title : String, details : String) : void
+}
+
+class LedFacadeMedia <<ConcreteImplementor>> {
+  + getMediaName() : String
+  + renderContent(adType : String, title : String, details : String) : void
+}
+
+abstract class Advertisement <<Abstraction>> {
+  # media : DisplayMedia
+  # title : String
+  + Advertisement(title : String, media : DisplayMedia)
+  + setMedia(media : DisplayMedia) : void
+  + {abstract} show() : void
+}
+
+class TrailerAd <<RefinedAbstraction>> {
+  - releaseDate : String
+  + TrailerAd(title : String, releaseDate : String, media : DisplayMedia)
+  + show() : void
+}
+
+class PartnerAd <<RefinedAbstraction>> {
+  - partnerBrand : String
+  + PartnerAd(title : String, partnerBrand : String, media : DisplayMedia)
+  + show() : void
+}
+
+class SocialAd <<RefinedAbstraction>> {
+  - organization : String
+  + SocialAd(title : String, organization : String, media : DisplayMedia)
+  + show() : void
+}
+
+class Task3Runner <<Client>> {
+  + {static} main(args : String[]) : void
+  + {static} run() : void
+}
+
+DisplayMedia <|.. HallScreenMedia
+DisplayMedia <|.. FoyerScreensMedia
+DisplayMedia <|.. MobileAppMedia
+DisplayMedia <|.. LedFacadeMedia
+
+Advertisement o--> "1" DisplayMedia : #media
+
+Advertisement <|-- TrailerAd
+Advertisement <|-- PartnerAd
+Advertisement <|-- SocialAd
+
+Task3Runner ..> Advertisement : uses
+Task3Runner ..> DisplayMedia : creates
+@enduml
