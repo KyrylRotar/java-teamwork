@@ -1,0 +1,68 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+interface ProgramComponent <<Component>> {
+  + getName() : String
+  + getDurationMinutes() : int
+  + getFilmCount() : int
+  + printTree(indentation : String) : void
+}
+
+class Film <<Leaf>> {
+  - title : String
+  - durationMinutes : int
+  + Film(title : String, durationMinutes : int)
+  + getName() : String
+  + getDurationMinutes() : int
+  + getFilmCount() : int
+  + printTree(indentation : String) : void
+}
+
+abstract class ProgramGroup <<Composite>> {
+  - name : String
+  - components : List<ProgramComponent>
+  # ProgramGroup(name : String)
+  + add(component : ProgramComponent) : void
+  + getName() : String
+  + getDurationMinutes() : int
+  + getFilmCount() : int
+  + printTree(indentation : String) : void
+}
+
+class FilmFestival <<ConcreteComposite>>
+class ThematicBlock <<ConcreteComposite>>
+class Screening <<ConcreteComposite>>
+class ShortFilmCollection <<ConcreteComposite>>
+
+class Task1Runner <<Client>> {
+  - Task1Runner()
+  + {static} main(args : String[]) : void
+  + {static} run() : void
+}
+
+class EventLogger {
+  + {static} log(source : String, message : String) : void
+}
+
+ProgramComponent <|.. Film
+ProgramComponent <|.. ProgramGroup
+ProgramGroup <|-- FilmFestival
+ProgramGroup <|-- ThematicBlock
+ProgramGroup <|-- Screening
+ProgramGroup <|-- ShortFilmCollection
+
+ProgramGroup "1" *--> "0..*" ProgramComponent : children
+Task1Runner ..> FilmFestival : builds and displays
+Task1Runner ..> ThematicBlock
+Task1Runner ..> Screening
+Task1Runner ..> ShortFilmCollection
+Task1Runner ..> Film
+ProgramGroup ..> EventLogger : logs tree
+Film ..> EventLogger : logs node
+
+note right of ProgramGroup
+  Duration and film count are calculated
+  recursively for all child components.
+end note
+@enduml
