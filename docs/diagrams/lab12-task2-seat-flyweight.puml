@@ -1,0 +1,75 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+enum SeatCategoryType <<Flyweight key>> {
+  STANDARD
+  COMFORT
+  VIP
+  --
+  - name : String
+  - description : String
+  - widthCm : int
+  - iconImage : String
+  - basePrice : double
+}
+
+class SeatCategory <<ConcreteFlyweight>> {
+  - name : String
+  - description : String
+  - widthCm : int
+  - iconImage : String
+  - basePrice : double
+  ~ SeatCategory(type : SeatCategoryType)
+  + getName() : String
+  + getDescription() : String
+  + getWidthCm() : int
+  + getIconImage() : String
+  + getBasePrice() : double
+}
+
+class SeatCategoryFactory <<FlyweightFactory>> {
+  - categories : Map<SeatCategoryType, SeatCategory>
+  + getCategory(type : SeatCategoryType) : SeatCategory
+  + getCreatedCategoryCount() : int
+}
+
+class CinemaSeat <<Context>> {
+  - sessionId : String
+  - row : String
+  - number : int
+  - category : SeatCategory
+  - sold : boolean
+  + CinemaSeat(sessionId : String, row : String, number : int, category : SeatCategory)
+  + sell() : void
+  + getSeatId() : String
+  + getCategory() : SeatCategory
+  + isSold() : boolean
+  + getFullDescription() : String
+}
+
+class Task2Runner <<Client>> {
+  - {static} SESSION_COUNT : int
+  - {static} ROW_COUNT : int
+  - {static} SEATS_PER_ROW : int
+  - Task2Runner()
+  + {static} main(args : String[]) : void
+  + {static} run() : void
+  - {static} categoryForRow(rowNumber : int) : SeatCategoryType
+}
+
+SeatCategoryFactory ..> SeatCategoryType : key
+SeatCategoryFactory "1" o--> "0..*" SeatCategory : caches
+SeatCategory ..> SeatCategoryType : creates from
+CinemaSeat "0..*" --> "1" SeatCategory : shared category
+Task2Runner ..> SeatCategoryFactory : requests flyweights
+Task2Runner ..> CinemaSeat : creates 36,000 contexts
+
+note right of CinemaSeat
+  Intrinsic state is shared in SeatCategory:
+  category name, description, width, icon, price.
+
+  Extrinsic state stays on each seat:
+  session, row, number, sold status.
+end note
+@enduml

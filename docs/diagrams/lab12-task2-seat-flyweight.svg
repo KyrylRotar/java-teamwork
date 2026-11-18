@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1460" height="1000" viewBox="0 0 1460 1000" role="img" aria-labelledby="title description">
+  <title id="title">Діаграма класів Flyweight — схема місць кінотеатру</title>
+  <desc id="description">UML-діаграма фабрики категорій місць, спільних об'єктів категорій та індивідуальних місць сеансів.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="14" markerHeight="14" refX="12" refY="7" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1 1 L12 7 L1 13" fill="none" stroke="#334155" stroke-width="1.7"/>
+    </marker>
+    <marker id="dependency" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1 1 L10 6 L1 11" fill="none" stroke="#64748b" stroke-width="1.5"/>
+    </marker>
+    <style>
+      text { font-family: "Segoe UI", Arial, sans-serif; fill: #172033; }
+      .title { font-size: 28px; font-weight: 700; }
+      .subtitle { font-size: 16px; fill: #475569; }
+      .box { fill: #fff; stroke: #334155; stroke-width: 2; rx: 8; }
+      .key-head { fill: #fef3c7; }
+      .factory-head { fill: #dbeafe; }
+      .fly-head { fill: #ede9fe; }
+      .context-head { fill: #dcfce7; }
+      .client-head { fill: #e0f2fe; }
+      .type { font-size: 13px; font-style: italic; fill: #475569; }
+      .name { font-size: 19px; font-weight: 700; }
+      .member { font-size: 15px; }
+      .divider { stroke: #94a3b8; stroke-width: 1; }
+      .link { fill: none; stroke: #334155; stroke-width: 2; }
+      .dependency-line { fill: none; stroke: #64748b; stroke-width: 1.8; stroke-dasharray: 7 6; }
+      .label { font-size: 14px; fill: #334155; }
+      .note { fill: #fffbeb; stroke: #d97706; stroke-width: 1.5; }
+      .note-text { font-size: 15px; fill: #78350f; }
+    </style>
+  </defs>
+
+  <rect width="1460" height="1000" fill="#f8fafc"/>
+  <text class="title" x="730" y="42" text-anchor="middle">Схема місць на сеансах — Flyweight</text>
+  <text class="subtitle" x="730" y="68" text-anchor="middle">Варіант 4 · кінотеатр «Кадр» · діаграма класів</text>
+
+  <!-- Factory maintains the shared flyweights indexed by category type. -->
+  <path class="link" d="M450 235 L520 235" marker-end="url(#arrow)"/>
+  <text class="label" x="463" y="222">key</text>
+  <path class="link" d="M820 245 L900 245" marker-end="url(#arrow)"/>
+  <text class="label" x="830" y="231">creates from</text>
+
+  <!-- Each CinemaSeat keeps its own context and references a shared category. -->
+  <path class="link" d="M560 625 L500 625 L500 425 L1020 425 L1020 410" marker-end="url(#arrow)"/>
+  <text class="label" x="515" y="615">0..*</text>
+  <text class="label" x="1000" y="418">1</text>
+  <text class="label" x="707" y="414">shared category</text>
+
+  <!-- Client dependencies. -->
+  <path class="dependency-line" d="M270 795 L270 730 L360 730 L360 360" marker-end="url(#dependency)"/>
+  <text class="label" x="278" y="718">requests flyweights</text>
+  <path class="dependency-line" d="M455 795 L455 760 L685 760 L685 750" marker-end="url(#dependency)"/>
+  <text class="label" x="500" y="752">creates seats</text>
+
+  <g>
+    <rect class="box" x="70" y="130" width="380" height="230"/>
+    <path class="key-head" d="M78 130 H442 Q450 130 450 138 V185 H70 V138 Q70 130 78 130 Z"/>
+    <text class="type" x="260" y="153" text-anchor="middle">«Flyweight key»</text>
+    <text class="name" x="260" y="177" text-anchor="middle">SeatCategoryType</text>
+    <line class="divider" x1="70" y1="185" x2="450" y2="185"/>
+    <text class="member" x="92" y="211">STANDARD</text>
+    <text class="member" x="92" y="235">COMFORT</text>
+    <text class="member" x="92" y="259">VIP</text>
+    <line class="divider" x1="70" y1="273" x2="450" y2="273"/>
+    <text class="member" x="92" y="298">- name, description : String</text>
+    <text class="member" x="92" y="321">- widthCm : int; iconImage : String</text>
+    <text class="member" x="92" y="344">- basePrice : double</text>
+  </g>
+
+  <g>
+    <rect class="box" x="520" y="130" width="300" height="230"/>
+    <path class="factory-head" d="M528 130 H812 Q820 130 820 138 V185 H520 V138 Q520 130 528 130 Z"/>
+    <text class="type" x="670" y="153" text-anchor="middle">«FlyweightFactory»</text>
+    <text class="name" x="670" y="177" text-anchor="middle">SeatCategoryFactory</text>
+    <line class="divider" x1="520" y1="185" x2="820" y2="185"/>
+    <text class="member" x="542" y="215">- categories :</text>
+    <text class="member" x="558" y="238">Map&lt;SeatCategoryType, SeatCategory&gt;</text>
+    <line class="divider" x1="520" y1="254" x2="820" y2="254"/>
+    <text class="member" x="542" y="283">+ getCategory(type) : SeatCategory</text>
+    <text class="member" x="542" y="313">+ getCreatedCategoryCount() : int</text>
+    <text class="label" x="542" y="340">повторно використовує кешовані категорії</text>
+  </g>
+
+  <g>
+    <rect class="box" x="900" y="130" width="470" height="280"/>
+    <path class="fly-head" d="M908 130 H1362 Q1370 130 1370 138 V185 H900 V138 Q900 130 908 130 Z"/>
+    <text class="type" x="1135" y="153" text-anchor="middle">«ConcreteFlyweight»</text>
+    <text class="name" x="1135" y="177" text-anchor="middle">SeatCategory</text>
+    <line class="divider" x1="900" y1="185" x2="1370" y2="185"/>
+    <text class="member" x="922" y="211">- name : String</text>
+    <text class="member" x="922" y="234">- description : String</text>
+    <text class="member" x="922" y="257">- widthCm : int</text>
+    <text class="member" x="922" y="280">- iconImage : String</text>
+    <text class="member" x="922" y="303">- basePrice : double</text>
+    <line class="divider" x1="900" y1="316" x2="1370" y2="316"/>
+    <text class="member" x="922" y="343">~ SeatCategory(type : SeatCategoryType)</text>
+    <text class="member" x="922" y="372">+ getName(), getDescription(), getWidthCm()</text>
+    <text class="member" x="922" y="395">+ getIconImage(), getBasePrice()</text>
+  </g>
+
+  <g>
+    <rect class="box" x="560" y="500" width="500" height="250"/>
+    <path class="context-head" d="M568 500 H1052 Q1060 500 1060 508 V555 H560 V508 Q560 500 568 500 Z"/>
+    <text class="type" x="810" y="523" text-anchor="middle">«Context»</text>
+    <text class="name" x="810" y="547" text-anchor="middle">CinemaSeat</text>
+    <line class="divider" x1="560" y1="555" x2="1060" y2="555"/>
+    <text class="member" x="582" y="581">- sessionId : String; row : String</text>
+    <text class="member" x="582" y="604">- number : int; sold : boolean</text>
+    <text class="member" x="582" y="627">- category : SeatCategory</text>
+    <line class="divider" x1="560" y1="641" x2="1060" y2="641"/>
+    <text class="member" x="582" y="669">+ sell() : void; getSeatId() : String</text>
+    <text class="member" x="582" y="697">+ getCategory() : SeatCategory; isSold() : boolean</text>
+    <text class="member" x="582" y="725">+ getFullDescription() : String</text>
+  </g>
+
+  <g>
+    <rect class="box" x="70" y="795" width="500" height="160"/>
+    <path class="client-head" d="M78 795 H562 Q570 795 570 803 V850 H70 V803 Q70 795 78 795 Z"/>
+    <text class="type" x="320" y="818" text-anchor="middle">«Client»</text>
+    <text class="name" x="320" y="842" text-anchor="middle">Task2Runner</text>
+    <line class="divider" x1="70" y1="850" x2="570" y2="850"/>
+    <text class="member" x="92" y="879">- SESSION_COUNT = 200; ROW_COUNT = 10</text>
+    <text class="member" x="92" y="903">- SEATS_PER_ROW = 18</text>
+    <text class="member" x="92" y="931">+ main(args) : void; + run() : void</text>
+  </g>
+
+  <g>
+    <rect class="note" x="760" y="820" width="610" height="135" rx="8"/>
+    <text class="note-text" x="785" y="851">Спільний стан: категорія, опис, ширина, значок і базова ціна.</text>
+    <text class="note-text" x="785" y="881">Власний стан: сеанс, ряд, номер і статус продажу кожного місця.</text>
+    <text class="note-text" x="785" y="911">Для 36 000 місць фабрика створює лише 3 категорії: стандарт, комфорт, VIP.</text>
+    <text class="note-text" x="785" y="938">VIP-місця різних сеансів посилаються на той самий об'єкт категорії.</text>
+  </g>
+</svg>
