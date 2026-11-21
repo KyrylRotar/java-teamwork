@@ -1,0 +1,61 @@
+@startuml
+!pragma layout smetana
+skinparam classAttributeIconSize 0
+
+interface HallCommand <<Command>> {
+  + execute() : void
+  + undo() : void
+  + getName() : String
+}
+
+class CinemaHall <<Receiver>> {
+  - lightsOn : boolean
+  - volume : int
+  - paused : boolean
+  - advertising : boolean
+  + setLightsOn(lightsOn : boolean) : void
+  + setVolume(volume : int) : void
+  + setPaused(paused : boolean) : void
+  + setAdvertising(advertising : boolean) : void
+  + printState(source : String) : void
+}
+
+class SetLightsCommand <<ConcreteCommand>>
+class SetVolumeCommand <<ConcreteCommand>>
+class PauseCommand <<ConcreteCommand>>
+class AdvertisingCommand <<ConcreteCommand>>
+
+class MacroCommand <<MacroCommand>> {
+  - name : String
+  - commands : List<HallCommand>
+  + execute() : void
+  + undo() : void
+}
+
+class HallOperator <<Invoker>> {
+  - history : Deque<HallCommand>
+  + execute(command : HallCommand) : void
+  + undoLast() : void
+}
+
+class Task1 <<Client>> {
+  + {static} run() : void
+  + {static} main(args : String[]) : void
+}
+
+HallCommand <|.. SetLightsCommand
+HallCommand <|.. SetVolumeCommand
+HallCommand <|.. PauseCommand
+HallCommand <|.. AdvertisingCommand
+HallCommand <|.. MacroCommand
+
+SetLightsCommand --> "1" CinemaHall : hall
+SetVolumeCommand --> "1" CinemaHall : hall
+PauseCommand --> "1" CinemaHall : hall
+AdvertisingCommand --> "1" CinemaHall : hall
+HallOperator o--> "*" HallCommand : history
+MacroCommand o--> "*" HallCommand : commands
+Task1 ..> HallOperator : creates
+Task1 ..> CinemaHall : creates
+Task1 ..> HallCommand : creates
+@enduml
